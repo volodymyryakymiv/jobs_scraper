@@ -6,7 +6,7 @@ from datetime import datetime, date, timedelta
 class WorkSpider(scrapy.Spider):
     name = "workspider"
     allowed_domains = ["www.work.ua"]
-    start_urls = ["https://www.work.ua/en/jobs-industry-it/"]
+    start_urls = ["https://www.work.ua/en/jobs-industry-it/?industry=21331&days=122"]
     base_link = "https://www.work.ua"
 
     def parse(self, response):
