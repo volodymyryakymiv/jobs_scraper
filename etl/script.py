@@ -8,7 +8,9 @@ from botocore.exceptions import ClientError
 def get_api():
 
     secret_name = "Groq_API"
-    region_name = os.getenv("REGION_NAME", "eu-north-1")
+    region_name = "eu-north-1"
+
+    # The secret is stored in AWS Secrets ManagerBU
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -33,12 +35,12 @@ def get_api():
 
 current_directory = os.getcwd()
 s3 = boto3.client('s3')
-bucket_name = os.getenv("S3_BUCKET_NAME")
+BUCKET_NAME = "scrapy-data-bucket-872h5nh309ho4k"
 INPUT_KEY = 'raw/data.jsonl'
 OUTPUT_KEY = 'processed/data.jsonl'
 client = Groq(api_key=get_api())
 
-response = s3.get_object(Bucket=bucket_name, Key=INPUT_KEY)
+response = s3.get_object(Bucket=BUCKET_NAME, Key=INPUT_KEY)
 lines = response['Body'].read().decode('utf-8').splitlines()
 
 data = [json.loads(line) for line in lines]
@@ -80,5 +82,5 @@ for row in data:
     processed_data.append(json.loads(edited_text))
 
 if not len(processed_data):
-    s3.put_object(Bucket=bucket_name, Key=OUTPUT_KEY, Body=processed_data.encode('utf-8'))
+    s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body=processed_data.encode('utf-8'))
 
