@@ -20,7 +20,7 @@ class WorkItem(scrapy.Item):
     link = scrapy.Field()
     publication_date = scrapy.Field()
     description = scrapy.Field()
-
+# title, company, salary, location, languages, experience, education, employment_type, skills, link, publication_date
 
 class RobotaItem(scrapy.Item):
     # id = scrapy.Field()
@@ -39,6 +39,19 @@ class DouItem(scrapy.Item):
     company_name = scrapy.Field()
     location = scrapy.Field()
     salary = scrapy.Field()
+    link = scrapy.Field()
+    publication_date = scrapy.Field()
+    description = scrapy.Field()
+
+class DjinniItem(scrapy.Item):
+    title = scrapy.Field()
+    company_name = scrapy.Field()
+    location = scrapy.Field()
+    languages = scrapy.Field()
+    employment_type = scrapy.Field()
+    salary = scrapy.Field()
+    experience = scrapy.Field()
+    category = scrapy.Field()
     link = scrapy.Field()
     publication_date = scrapy.Field()
     description = scrapy.Field()

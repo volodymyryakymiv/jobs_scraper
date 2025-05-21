@@ -9,23 +9,45 @@ class DOUSpider(scrapy.Spider):
     name = "douspider"
     allowed_domains = ["www.dou.ua", "dou.ua"]
     start_urls = ['https://jobs.dou.ua/vacancies/feeds/']  # List of URLs to start scraping
+    used_ids = set()
+
+
+    def start_requests(self):   
+        used_ids = self.used_ids
+        try:
+            with open("dou_ids.txt", "r") as file:
+                for line in file:
+                    used_ids.add(line.strip())
+        except FileNotFoundError:
+            pass
+        self.used_ids = used_ids
+        yield scrapy.Request(self.start_urls[0], callback=self.parse)
 
 
     def parse(self, response):
         items = response.css("item")
         dou = DouItem()
-        for item in items:
-            
-            title_data = self.get_data_from_title(item.css("title::text").get())
-            for key, value in title_data.items():
-                dou[key] = value
-            
-            dou["link"] = item.css("link::text").get()
-            # dou["description"] = remove_tags(item.css("description::text").get())
-            dou["description"] = item.css("description::text").get()
+        used_ids = self.used_ids
+        with open("dou_ids.txt", "a") as file:
+            for item in items:
+                id = item.css("link::text").get().split("/")[-2]
+                pub_date = item.css("pubDate::text").get()
+                unique_id = id + " " + pub_date
+                if unique_id in used_ids:
+                    continue
+                used_ids.add(unique_id)
+                file.write(unique_id + "\n")
+                title_data = self.get_data_from_title(item.css("title::text").get())
+                for key, value in title_data.items():
+                    dou[key] = value
+                
+                dou["link"] = item.css("link::text").get()
+                # dou["description"] = remove_tags(item.css("description::text").get())
+                dou["description"] = item.css("description::text").get()
 
-            dou["publication_date"] = self.get_pub_date(item.css("pubDate::text").get())
-            yield dou
+                dou["publication_date"] = self.get_pub_date(item.css("pubDate::text").get())
+                yield dou
+        self.used_ids = used_ids
 
 
 
@@ -70,15 +92,15 @@ class DOUSpider(scrapy.Spider):
                 salary_dict = dict()
                 if "до" in part.lower():
                     print(part)
-                    salary_dict["min"] = None
-                    salary_dict["max"] = int(part.split("до")[1][2:])
+                    salary_dict["from"] = None
+                    salary_dict["to"] = int(part.split("до")[1][2:])
                 elif "від" in part.lower():
-                    salary_dict["min"] = int(part.split("від")[1][2:])
-                    salary_dict["max"] = None
+                    salary_dict["from"] = int(part.split("від")[1][2:])
+                    salary_dict["to"] = None
                 elif "–" in part:
                     s = part.split("–")
-                    salary_dict["min"] = int(s[0][1:].strip())
-                    salary_dict["max"] = int(s[1].strip())
+                    salary_dict["from"] = int(s[0][1:].strip())
+                    salary_dict["to"] = int(s[1].strip())
                 else:
                     salary_dict["salary"] = part[1:].strip()
                 salary_dict["currency"] = "USD"

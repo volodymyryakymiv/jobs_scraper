@@ -34,8 +34,9 @@ class RobotaSpider(scrapy.Spider):
 
         # Extract data or follow links
         data = json.loads(response.text)
-        stopped = False
-
+        if not len(data.get('documents')):
+            return
+        
         for item in data.get('documents', []):
             print(f"Parsing page {self.page_num} from {response.url}")
             # Check if the publication date is today
@@ -43,13 +44,9 @@ class RobotaSpider(scrapy.Spider):
             if item_date == date.today().strftime("%Y-%m-%d"):
                 job_url = f"https://api.robota.ua/vacancy?id={item.get('id')}"
                 yield scrapy.Request(job_url, callback=self.get_job_details)
-            else:
-                stopped = True
-                break
 
-        if not stopped:
-            self.page_num += 1
-            yield scrapy.Request(f'{self.start_urls[0]}&page={self.page_num}', callback=self.parse)
+        self.page_num += 1
+        yield scrapy.Request(f'{self.start_urls[0]}&page={self.page_num}', callback=self.parse)
     
     def get_job_details(self, response):
         # Extract job details from the job page
