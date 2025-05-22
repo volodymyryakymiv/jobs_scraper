@@ -84,7 +84,7 @@ for row in data:
         processed_data.append(json.loads(edited_text))
 
 if len(processed_data):
-    s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body=processed_data.encode('utf-8'))
+    s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body='\n'.join(processed_data).encode('utf-8'))
 else:
     print("No data to process.")
 
