@@ -43,7 +43,7 @@ client = Groq(api_key=get_api())
 response = s3.get_object(Bucket=BUCKET_NAME, Key=INPUT_KEY)
 lines = response['Body'].read().decode('utf-8').splitlines()
 
-data = [json.loads(line) for line in lines]
+data = [json.loads(line) for line in lines if line.strip()]
 processed_data = []
 
 for row in data:
