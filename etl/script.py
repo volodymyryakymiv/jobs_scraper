@@ -79,7 +79,8 @@ for row in data:
     )
     response_text = chat_completion.choices[0].message.content
     edited_text = response_text.replace("```jsonl", '').replace("```", '')
-    processed_data.append(json.loads(edited_text))
+    if edited_text.strip():
+        processed_data.append(json.loads(edited_text))
 
 if not len(processed_data):
     s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body=processed_data.encode('utf-8'))
