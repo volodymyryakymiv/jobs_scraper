@@ -4,11 +4,15 @@ from groq import Groq
 import boto3
 from botocore.exceptions import ClientError
 
+REGION_NAME = "eu-north-1"
+BUCKET_NAME = "scrapy-data-bucket-872h5nh309ho4k"
+INPUT_KEY = 'raw/data.jsonl'
+OUTPUT_KEY = 'processed/data.jsonl'
+TABLE_NAME = 'jobs'
 
 def get_api():
 
     secret_name = "Groq_API"
-    region_name = "eu-north-1"
 
     # The secret is stored in AWS Secrets ManagerBU
 
@@ -16,7 +20,7 @@ def get_api():
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
-        region_name=region_name
+        region_name=REGION_NAME
     )
 
     try:
@@ -35,10 +39,9 @@ def get_api():
 
 current_directory = os.getcwd()
 s3 = boto3.client('s3')
-BUCKET_NAME = "scrapy-data-bucket-872h5nh309ho4k"
-INPUT_KEY = 'raw/data.jsonl'
-OUTPUT_KEY = 'processed/data.jsonl'
 client = Groq(api_key=get_api())
+dynamodb = boto3.resource('dynamodb', region_name=REGION_NAME)
+table = dynamodb.Table(TABLE_NAME)
 
 response = s3.get_object(Bucket=BUCKET_NAME, Key=INPUT_KEY)
 lines = response['Body'].read().decode('utf-8').splitlines()
@@ -79,9 +82,11 @@ for row in data:
     )
     response_text = chat_completion.choices[0].message.content
     edited_text = response_text.replace("```json", '').replace("```", '').strip()
+    record = json.loads(edited_text)
     if len(edited_text):
         print("Transformed data: ", edited_text)
         processed_data.append(edited_text)
+        table.put_item(Item=record)
 
 if len(processed_data):
     s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body='\n'.join(processed_data).encode('utf-8'))
