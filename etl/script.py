@@ -81,7 +81,7 @@ for row in data:
     edited_text = response_text.replace("```json", '').replace("```", '').strip()
     if len(edited_text):
         print("Transformed data: ", edited_text)
-        processed_data.append(json.loads(edited_text))
+        processed_data.append(edited_text)
 
 if len(processed_data):
     s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body='\n'.join(processed_data).encode('utf-8'))
