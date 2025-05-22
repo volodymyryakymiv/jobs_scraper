@@ -78,8 +78,8 @@ for row in data:
         model="llama-3.3-70b-versatile",
     )
     response_text = chat_completion.choices[0].message.content
-    edited_text = response_text.replace("```jsonl", '').replace("```", '')
-    if edited_text.strip():
+    edited_text = response_text.replace("```json", '').replace("```", '')
+    if len(edited_text.strip()):
         print("Transformed data: ", edited_text)
         processed_data.append(json.loads(edited_text))
 
