@@ -45,7 +45,7 @@ lines = response['Body'].read().decode('utf-8').splitlines()
 
 data = [json.loads(line) for line in lines if line.strip()]
 processed_data = []
-
+print("Data loaded from S3 bucket: ", len(data))
 for row in data:
     chat_completion = client.chat.completions.create(
         messages = [
@@ -80,8 +80,11 @@ for row in data:
     response_text = chat_completion.choices[0].message.content
     edited_text = response_text.replace("```jsonl", '').replace("```", '')
     if edited_text.strip():
+        print("Transformed data: ", edited_text)
         processed_data.append(json.loads(edited_text))
 
 if not len(processed_data):
     s3.put_object(Bucket=BUCKET_NAME, Key=OUTPUT_KEY, Body=processed_data.encode('utf-8'))
+else:
+    print("No data to process.")
 
