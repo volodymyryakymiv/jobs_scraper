@@ -53,9 +53,6 @@ class RobotaSpider(scrapy.Spider):
         data = json.loads(response.text)
 
         item = RobotaItem()
-
-
-
         
         # item['id'] = data.get('id')
         item['title'] = data.get('name')

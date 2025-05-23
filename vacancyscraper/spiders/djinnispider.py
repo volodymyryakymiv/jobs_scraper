@@ -46,7 +46,6 @@ class DjinniSpider(scrapy.Spider):
         item["link"] = "https://djinni.co/jobs/" + str(data.get("id"))
         item["location"] = data.get("location").split(", ") if data.get("location") else None
         item["experience"] = data.get("experience")
-        item["category"] = data.get("category").get("id")
         item["languages"] = {"English": self.transform_languages(data.get("english").get("id"))}
         item["employment_type"] = "part-time" if data.get("is_parttime") else "full-time"
         item["salary"] = {"from": data.get("public_salary_min"), "to": data.get("public_salary_max"), "currency": "USD"} if data.get("public_salary_min") or data.get("public_salary_max") else None

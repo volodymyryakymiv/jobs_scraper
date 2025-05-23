@@ -51,7 +51,6 @@ class DjinniItem(scrapy.Item):
     employment_type = scrapy.Field()
     salary = scrapy.Field()
     experience = scrapy.Field()
-    category = scrapy.Field()
     link = scrapy.Field()
     publication_date = scrapy.Field()
     description = scrapy.Field()
