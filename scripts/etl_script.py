@@ -6,7 +6,7 @@ import json
 
 processed_jobs = set()
 
-
+openai.api_key = f.get_api()
 s3 = boto3.client('s3')
 client = openai.OpenAI()
 
