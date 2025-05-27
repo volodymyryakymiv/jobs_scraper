@@ -80,7 +80,7 @@ def insert_job(job, conn):
 
 def get_api(region_name="eu-north-1"):
 
-    secret_name = "Groq_API"
+    secret_name = "OpenAI_API"
 
     # Create a Secrets Manager client
     session = boto3.session.Session()
@@ -98,7 +98,7 @@ def get_api(region_name="eu-north-1"):
 
     secret = get_secret_value_response['SecretString']
     secret_dict = json.loads(secret)
-    api_key = secret_dict["api_key_gmail"]
+    api_key = secret_dict["api_key"]
 
     return api_key
 
